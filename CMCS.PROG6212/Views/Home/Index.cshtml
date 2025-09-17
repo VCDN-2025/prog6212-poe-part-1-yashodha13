@@ -1,0 +1,76 @@
+﻿@{
+    ViewData["Title"] = "Welcome to CMCS";
+}
+
+<style>
+    html, body {
+        height: 100%; /* Full height support */
+        margin: 0;
+    }
+
+    /* Full-page background that grows with content */
+    .home-background {
+        background: url('/images/background.jpg') no-repeat center center fixed;
+        background-size: cover;
+        width: 100%;
+        min-height: 100vh; /* At least full screen height */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: white;
+        padding: 50px 20px;
+    }
+
+    /* Card hover effect */
+    .role-card {
+        transition: transform 0.3s, box-shadow 0.3s;
+        cursor: pointer;
+    }
+
+        .role-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+</style>
+
+<div class="home-background">
+    <h1 class="display-4 mb-4">Claim Management and Coordination System</h1>
+    <p class="lead mb-5">Manage lecturer claims with ease. Choose your role below to continue.</p>
+
+    <div class="row justify-content-center w-100">
+        <!-- Lecturer Card -->
+        <div class="col-md-3 mb-4">
+            <div class="card role-card shadow-lg border-0 h-100">
+                <div class="card-body">
+                    <h4 class="card-title">Lecturer</h4>
+                    <p class="card-text">Submit and track your monthly claims.</p>
+                    <a asp-controller="Lecturer" asp-action="Dashboard" class="btn btn-primary">Go</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coordinator Card -->
+        <div class="col-md-3 mb-4">
+            <div class="card role-card shadow-lg border-0 h-100">
+                <div class="card-body">
+                    <h4 class="card-title">Coordinator</h4>
+                    <p class="card-text">Review and comment on submitted claims.</p>
+                    <a asp-controller="Coordinator" asp-action="Index" class="btn btn-warning">Go</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Academic Manager Card -->
+        <div class="col-md-3 mb-4">
+            <div class="card role-card shadow-lg border-0 h-100">
+                <div class="card-body">
+                    <h4 class="card-title">Academic Manager</h4>
+                    <p class="card-text">Approve or reject claims submitted by lecturers.</p>
+                    <a asp-controller="AcademicManager" asp-action="Index" class="btn btn-success">Go</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,33 @@
+﻿@model IEnumerable<CMCS.PROG6212.Models.Claim>
+
+@{
+    ViewData["Title"] = "Lecturer Dashboard";
+}
+
+<h2>Lecturer Dashboard</h2>
+
+<p>Welcome to your claims dashboard. Below is a list of your submitted claims:</p>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Claim ID</th>
+            <th>Month</th>
+            <th>Total Amount</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var claim in Model)
+        {
+            <tr>
+                <td>@claim.ClaimId</td>
+                <td>@claim.Month.ToString("MMMM yyyy")</td>
+                <td>@claim.TotalAmount.ToString("C")</td>
+                <td>@claim.Status</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-controller="Lecturer" asp-action="CreateClaim" class="btn btn-primary">Submit New Claim</a>

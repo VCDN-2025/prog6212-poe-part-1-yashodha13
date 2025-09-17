@@ -1,0 +1,35 @@
+﻿@model CMCS.PROG6212.Models.Claim
+
+@{
+    ViewData["Title"] = "Approve Claim";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Approve Claim</h2>
+
+@if (Model != null)
+{
+    <div class="card mb-3">
+        <div class="card-header bg-primary text-white">
+            Claim Details
+        </div>
+        <div class="card-body">
+            <p><strong>Claim ID:</strong> @Model.ClaimId</p>
+            <p><strong>Lecturer ID:</strong> @Model.LecturerId</p>
+            <p><strong>Month:</strong> @Model.Month.ToString("MMMM yyyy")</p>
+            <p><strong>Total Amount:</strong> @Model.TotalAmount.ToString("C")</p>
+        </div>
+    </div>
+
+    <form asp-action="ConfirmApprove" method="post">
+        <input type="hidden" asp-for="ClaimId" />
+        <button type="submit" class="btn btn-success">Confirm Approve</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    </form>
+}
+else
+{
+    <div class="alert alert-warning">
+        No claim selected to approve.
+    </div>
+}

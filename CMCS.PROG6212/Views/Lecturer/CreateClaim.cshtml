@@ -1,0 +1,117 @@
+﻿@model CMCS.PROG6212.Models.Claim
+
+@{
+    ViewData["Title"] = "Create Claim";
+}
+
+<h2>Create Claim</h2>
+
+<form asp-action="CreateClaim" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label class="form-label">Month</label>
+        <input asp-for="Month" type="month" class="form-control" required />
+    </div>
+
+    <h5>Claim Items</h5>
+    <table class="table" id="items-table">
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th>Hours</th>
+                <th>Rate</th>
+                <th>Amount</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input name="ClaimItems[0].Description" class="form-control" /></td>
+                <td><input name="ClaimItems[0].HoursWorked" type="number" class="form-control hours" value="0" /></td>
+                <td><input name="ClaimItems[0].Rate" type="number" class="form-control rate" value="0" /></td>
+                <td class="amount">0.00</td>
+                <td><button type="button" class="btn btn-sm btn-danger remove-row">Remove</button></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <button type="button" id="add-row" class="btn btn-secondary">Add Item</button>
+
+    <div class="mb-3 mt-3">
+        <label class="form-label">Upload supporting document</label>
+        <div id="drop-area" class="border p-3 text-center" style="min-height: 100px;">
+            Drag & drop files here or click to select
+            <input type="file" id="fileElem" multiple style="display:none;">
+            <ul id="file-list" class="list-unstyled mt-2"></ul>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+@section Scripts {
+    <script>
+        let rowIndex = 1;
+
+        // Update amounts for each claim item row
+        function updateAmounts() {
+            $('#items-table tbody tr').each(function () {
+                const hours = parseFloat($(this).find('.hours').val()) || 0;
+                const rate = parseFloat($(this).find('.rate').val()) || 0;
+                $(this).find('.amount').text((hours * rate).toFixed(2));
+            });
+        }
+
+        $(document).on('input', '.hours, .rate', updateAmounts);
+
+        // Add new claim item row
+        $('#add-row').click(function () {
+            const newRow = `<tr>
+                <td><input name="ClaimItems[${rowIndex}].Description" class="form-control" /></td>
+                <td><input name="ClaimItems[${rowIndex}].HoursWorked" type="number" class="form-control hours" value="0" /></td>
+                <td><input name="ClaimItems[${rowIndex}].Rate" type="number" class="form-control rate" value="0" /></td>
+                <td class="amount">0.00</td>
+                <td><button type="button" class="btn btn-sm btn-danger remove-row">Remove</button></td>
+            </tr>`;
+            $('#items-table tbody').append(newRow);
+            rowIndex++;
+        });
+
+        // Remove claim item row
+        $(document).on('click', '.remove-row', function () {
+            $(this).closest('tr').remove();
+            updateAmounts();
+        });
+
+        // Drag-and-drop file upload
+        const dropArea = document.getElementById('drop-area');
+        const fileInput = document.getElementById('fileElem');
+        const fileList = document.getElementById('file-list');
+
+        dropArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropArea.classList.add('bg-light');
+        });
+
+        dropArea.addEventListener('dragleave', () => {
+            dropArea.classList.remove('bg-light');
+        });
+
+        dropArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropArea.classList.remove('bg-light');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        dropArea.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', () => handleFiles(fileInput.files));
+
+        function handleFiles(files) {
+            fileList.innerHTML = '';
+            Array.from(files).forEach(file => {
+                const li = document.createElement('li');
+                li.textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+                fileList.appendChild(li);
+            });
+        }
+    </script>
+}
