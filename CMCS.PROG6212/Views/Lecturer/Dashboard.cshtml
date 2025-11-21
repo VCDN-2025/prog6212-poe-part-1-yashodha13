@@ -2,32 +2,128 @@
 
 @{
     ViewData["Title"] = "Lecturer Dashboard";
+    var first = Model?.FirstOrDefault();
 }
 
-<h2>Lecturer Dashboard</h2>
+@* Dashboard table styling informed by Bootstrap table examples (Bootstrap, 2024). *@
 
-<p>Welcome to your claims dashboard. Below is a list of your submitted claims:</p>
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h2 class="card-title mb-3">Lecturer Dashboard</h2>
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Claim ID</th>
-            <th>Month</th>
-            <th>Total Amount</th>
-            <th>Status</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var claim in Model)
-        {
-            <tr>
-                <td>@claim.ClaimId</td>
-                <td>@claim.Month.ToString("MMMM yyyy")</td>
-                <td>@claim.TotalAmount.ToString("C")</td>
-                <td>@claim.Status</td>
-            </tr>
-        }
-    </tbody>
-</table>
+            <p class="mb-2">
+                <strong>Lecturer:</strong>
+                @if (first != null && !string.IsNullOrWhiteSpace(first.LecturerName))
+                {
+                    @first.LecturerName
+                }
+                else
+                {
+                    @:Lecturer ID @ViewBag.LecturerId
+                }
+            </p>
 
-<a asp-controller="Lecturer" asp-action="CreateClaim" class="btn btn-primary">Submit New Claim</a>
+            <p class="text-muted">
+                Below is a list of your submitted claims, their approval status and uploaded documents.
+            </p>
+
+            @* TempData messages for success / errors / warnings *@
+            @if (TempData["Msg"] != null)
+            {
+                <div class="alert alert-success">@TempData["Msg"]</div>
+            }
+            @if (TempData["Err"] != null)
+            {
+                <div class="alert alert-danger">@TempData["Err"]</div>
+            }
+            @if (TempData["Warn"] != null)
+            {
+                <div class="alert alert-warning">@TempData["Warn"]</div>
+            }
+
+            <table class="table table-bordered table-striped mt-3">
+                <thead class="table-light">
+                    <tr>
+                        <th>Claim ID</th>
+                        <th>Month</th>
+                        <th>Total Amount</th>
+                        <th>Overall Status</th>
+                        <th>Coordinator</th>
+                        <th>Academic Manager</th>
+                        <th>Documents</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var claim in Model)
+                        {
+                            <tr>
+                                <td>@claim.ClaimId</td>
+                                <td>@claim.Month.ToString("MMMM yyyy")</td>
+                                <td>@claim.TotalAmount.ToString("C")</td>
+                                <td>@claim.Status</td>
+                                <td>
+                                    @(claim.CoordinatorApproved ? "Approved" : "Pending / Not Approved")
+                                </td>
+                                <td>
+                                    @(claim.AcademicManagerApproved ? "Approved" : "Pending / Not Approved")
+                                </td>
+                                <td>
+                                    @if (claim.Documents != null && claim.Documents.Any())
+                                    {
+                                        @claim.Documents.Count @:file(s)
+                                    }
+                                    else
+                                    {
+                                        @:No documents
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">
+                                No claims submitted yet.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <a asp-controller="Lecturer"
+               asp-action="CreateClaim"
+               class="btn btn-primary">
+                Submit New Claim
+            </a>
+        </div>
+    </div>
+</div>
+
+@*
+References (if required for this view – hidden from the website using Razor comments)
+
+Microsoft Docs. 2025. Unit testing C# in .NET using dotnet test and xUnit. Microsoft Learn. 
+Available at: https://learn.microsoft.com/en-us/dotnet/core/testing/unit-testing-csharp-with-xunit 
+(Accessed: 22 October 2025).
+
+xUnit.net. 2025. Getting Started with xUnit.net v2. xUnit.net. 
+Available at: https://xunit.net/docs/getting-started/v2/getting-started 
+(Accessed: 22 October 2025).
+
+Chiarelli, A. 2021. Using xUnit to Test your C# Code. Auth0 Blog. 
+Available at: https://auth0.com/blog/xunit-to-test-csharp-code 
+(Accessed: 22 October 2025).
+
+Spasojević, M. 2022. Unit Testing with xUnit in ASP.NET Core. Code Maze. 
+Available at: https://code-maze.com/aspnetcore-unit-testing-xunit 
+(Accessed: 22 October 2025).
+
+Bruni, O. 2025. How to Use xUnit for Unit Testing in .NET Project Using C# in VSCode. 
+Available at: https://www.ottorinobruni.com/how-to-use-xunit-for-unit-testing-in-dotnet-project-using-csharp-in-vscode 
+(Accessed: 22 October 2025).
+*@
+

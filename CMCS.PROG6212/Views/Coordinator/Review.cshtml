@@ -1,14 +1,170 @@
-﻿@{
-    ViewData["Title"] = "Review Claim";
-    var id = ViewBag.ClaimId;
+﻿@model CMCS.PROG6212.Models.Claim
+
+@{
+    ViewData["Title"] = $"Review Claim #{Model.ClaimId}";
 }
 
-<h2>Review Claim #@id</h2>
+@* Coordinator review view structured using Bootstrap cards/tables and ASP.NET Core Razor patterns (Bootstrap, 2024; Microsoft, 2024a). *@
 
-<p>Details (prototype). Buttons below are non-functional in Part 1.</p>
+<div class="container mt-4">
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
+            <h2 class="card-title mb-3">Review Claim #@Model.ClaimId</h2>
 
-<div>
-    <button class="btn btn-success">Approve</button>
-    <button class="btn btn-warning">Request Changes</button>
-    <button class="btn btn-danger">Reject</button>
+            @if (TempData["Msg"] != null)
+            {
+                <div class="alert alert-success">@TempData["Msg"]</div>
+            }
+            <dt class="col-sm-3">Lecturer</dt>
+            <dd class="col-sm-9">
+                @if (!string.IsNullOrWhiteSpace(Model.LecturerName))
+                {
+                    @($"{Model.LecturerName} ({Model.LecturerId})")
+                }
+                else
+                {
+                    @Model.LecturerId
+                }
+            </dd>
+
+
+                <dt class="col-sm-3">Month</dt>
+                <dd class="col-sm-9">@Model.Month.ToString("MMMM yyyy")</dd>
+
+                <dt class="col-sm-3">Overall Status</dt>
+                <dd class="col-sm-9">
+                    <span class="badge bg-info">@Model.Status</span>
+                </dd>
+
+                <dt class="col-sm-3">Total Amount</dt>
+                <dd class="col-sm-9">
+                    <strong>@Model.TotalAmount.ToString("C")</strong>
+                </dd>
+
+                <dt class="col-sm-3">Coordinator Approval</dt>
+                <dd class="col-sm-9">
+                    @(Model.CoordinatorApproved ? "Approved" : "Not Approved Yet")
+                </dd>
+
+                <dt class="col-sm-3">Academic Manager Approval</dt>
+                <dd class="col-sm-9">
+                    @(Model.AcademicManagerApproved ? "Approved" : "Not Approved Yet")
+                </dd>
+
+                <dt class="col-sm-3">Coordinator Comments</dt>
+                <dd class="col-sm-9">
+                    @(!string.IsNullOrWhiteSpace(Model.CoordinatorComments)
+                                        ? Model.CoordinatorComments
+                                        : "—")
+                </dd>
+
+                <dt class="col-sm-3">Academic Manager Comments</dt>
+                <dd class="col-sm-9">
+                    @(!string.IsNullOrWhiteSpace(Model.AcademicManagerComments)
+                                        ? Model.AcademicManagerComments
+                                        : "—")
+                </dd>
+
+                <dt class="col-sm-3">Documents</dt>
+                <dd class="col-sm-9">
+                    @if (Model.Documents != null && Model.Documents.Any())
+                    {
+                        <ul class="list-unstyled mb-0">
+                            @foreach (var doc in Model.Documents)
+                            {
+                                <li>
+                                    <a asp-controller="Lecturer"
+                                       asp-action="DownloadDocument"
+                                       asp-route-id="@doc.DocumentId">
+                                        @doc.OriginalFileName
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <span class="text-muted">No documents uploaded for this claim.</span>
+                    }
+                </dd>
+            </dl>
+        </div>
+    </div>
+
+    <h5>Claim Items</h5>
+    <table class="table table-sm table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>Description</th>
+                <th>Hours</th>
+                <th>Rate</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var i in Model.ClaimItems)
+            {
+                <tr>
+                    <td>@i.Description</td>
+                    <td>@i.HoursWorked</td>
+                    <td>@i.Rate</td>
+                    <td>@i.Total</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="d-flex flex-wrap gap-2 mt-3">
+        <form asp-action="Approve" method="post" class="d-flex gap-2">
+            <input type="hidden" name="id" value="@Model.ClaimId" />
+            <input type="text"
+                   name="comment"
+                   class="form-control"
+                   placeholder="Coordinator comment (optional)" />
+            <button class="btn btn-success" type="submit">Approve</button>
+        </form>
+
+        <form asp-action="Reject" method="post" class="d-flex gap-2">
+            <input type="hidden" name="id" value="@Model.ClaimId" />
+            <input type="text"
+                   name="comment"
+                   class="form-control"
+                   placeholder="Coordinator comment (optional)" />
+            <button class="btn btn-danger" type="submit">Reject</button>
+        </form>
+
+        <a asp-action="Index" class="btn btn-outline-secondary ms-auto">Back</a>
+    </div>
 </div>
+
+@*
+References (if needed, keep them hidden using Razor comments)
+
+[Add IIE Harvard references here if this view requires them]
+*@
+
+
+
+@*
+References
+
+Microsoft Docs. 2025. Unit testing C# in .NET using dotnet test and xUnit. Microsoft Learn. 
+Available at: https://learn.microsoft.com/en-us/dotnet/core/testing/unit-testing-csharp-with-xunit 
+(Accessed: 22 October 2025).
+
+xUnit.net. 2025. Getting Started with xUnit.net v2. xUnit.net. 
+Available at: https://xunit.net/docs/getting-started/v2/getting-started 
+(Accessed: 22 October 2025).
+
+Chiarelli, A. 2021. Using xUnit to Test your C# Code. Auth0 Blog. 
+Available at: https://auth0.com/blog/xunit-to-test-csharp-code 
+(Accessed: 22 October 2025).
+
+Spasojević, M. 2022. Unit Testing with xUnit in ASP.NET Core. Code Maze. 
+Available at: https://code-maze.com/aspnetcore-unit-testing-xunit 
+(Accessed: 22 October 2025).
+
+Bruni, O. 2025. How to Use xUnit for Unit Testing in .NET Project Using C# in VSCode. 
+Available at: https://www.ottorinobruni.com/how-to-use-xunit-for-unit-testing-in-dotnet-project-using-csharp-in-vscode 
+(Accessed: 22 October 2025).
+*@

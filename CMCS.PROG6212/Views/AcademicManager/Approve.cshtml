@@ -1,35 +1,96 @@
 ﻿@model CMCS.PROG6212.Models.Claim
 
+@* Academic manager dashboard follows the same Bootstrap and Razor patterns for consistency (Bootstrap, 2024; Microsoft, 2024a). *@
+
+
 @{
-    ViewData["Title"] = "Approve Claim";
+    ViewData["Title"] = $"Approve Claim #{Model.ClaimId}";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Approve Claim</h2>
+<h2>Approve Claim #@Model.ClaimId (Academic Manager)</h2>
 
-@if (Model != null)
+@if (TempData["Msg"] != null)
 {
-    <div class="card mb-3">
-        <div class="card-header bg-primary text-white">
-            Claim Details
-        </div>
-        <div class="card-body">
-            <p><strong>Claim ID:</strong> @Model.ClaimId</p>
-            <p><strong>Lecturer ID:</strong> @Model.LecturerId</p>
-            <p><strong>Month:</strong> @Model.Month.ToString("MMMM yyyy")</p>
-            <p><strong>Total Amount:</strong> @Model.TotalAmount.ToString("C")</p>
-        </div>
-    </div>
+    <div class="alert alert-success">@TempData["Msg"]</div>
+}
 
-    <form asp-action="ConfirmApprove" method="post">
-        <input type="hidden" asp-for="ClaimId" />
-        <button type="submit" class="btn btn-success">Confirm Approve</button>
-        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+<div class="card mb-3">
+    <div class="card-header bg-primary text-white">Claim Details</div>
+    <div class="card-body">
+        <p><strong>Claim ID:</strong> @Model.ClaimId</p>
+        <p><strong>Lecturer ID:</strong> @Model.LecturerId</p>
+        <p><strong>Month:</strong> @Model.Month.ToString("MMMM yyyy")</p>
+        <p><strong>Total Amount:</strong> @Model.TotalAmount.ToString("C")</p>
+        <p><strong>Coordinator Comments:</strong> @(string.IsNullOrWhiteSpace(Model.CoordinatorComments) ? "—" : Model.CoordinatorComments)</p>
+        <p><strong>Status:</strong> <span class="badge bg-info">@Model.Status</span></p>
+    </div>
+</div>
+
+<h5>Claim Items</h5>
+<table class="table table-sm">
+    <thead>
+        <tr>
+            <th>Description</th>
+            <th>Hours</th>
+            <th>Rate</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var i in Model.ClaimItems)
+        {
+            <tr>
+                <td>@i.Description</td>
+                <td>@i.HoursWorked</td>
+                <td>@i.Rate</td>
+                <td>@i.Total</td>  b   
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="d-flex gap-2">
+    <!-- Approve (POST to ApproveConfirmed) -->
+    <form asp-action="ApproveConfirmed" method="post" class="d-flex gap-2">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@Model.ClaimId" />
+        <input type="text" name="comment" class="form-control" placeholder="Manager comment (optional)" />
+        <button class="btn btn-success" type="submit">Approve</button>
     </form>
-}
-else
-{
-    <div class="alert alert-warning">
-        No claim selected to approve.
-    </div>
-}
+
+    <!-- Reject (POST) -->
+    <form asp-action="Reject" method="post" class="d-flex gap-2">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@Model.ClaimId" />
+        <input type="text" name="comment" class="form-control" placeholder="Manager comment (optional)" />
+        <button class="btn btn-danger" type="submit">Reject</button>
+    </form>
+
+    <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+</div>
+
+
+@*
+References
+
+Microsoft Docs. 2025. Unit testing C# in .NET using dotnet test and xUnit. Microsoft Learn. 
+Available at: https://learn.microsoft.com/en-us/dotnet/core/testing/unit-testing-csharp-with-xunit 
+(Accessed: 22 October 2025).
+
+xUnit.net. 2025. Getting Started with xUnit.net v2. xUnit.net. 
+Available at: https://xunit.net/docs/getting-started/v2/getting-started 
+(Accessed: 22 October 2025).
+
+Chiarelli, A. 2021. Using xUnit to Test your C# Code. Auth0 Blog. 
+Available at: https://auth0.com/blog/xunit-to-test-csharp-code 
+(Accessed: 22 October 2025).
+
+Spasojević, M. 2022. Unit Testing with xUnit in ASP.NET Core. Code Maze. 
+Available at: https://code-maze.com/aspnetcore-unit-testing-xunit 
+(Accessed: 22 October 2025).
+
+Bruni, O. 2025. How to Use xUnit for Unit Testing in .NET Project Using C# in VSCode. 
+Available at: https://www.ottorinobruni.com/how-to-use-xunit-for-unit-testing-in-dotnet-project-using-csharp-in-vscode 
+(Accessed: 22 October 2025).
+*@
